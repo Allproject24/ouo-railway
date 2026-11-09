@@ -1,6 +1,7 @@
-FROM golang:1.20-alpine AS builder
+FROM golang:1.22-alpine AS builder
 WORKDIR /app
-COPY . .
+COPY go.mod ./
+COPY main.go ./
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o /ouo-service .
 
