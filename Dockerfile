@@ -2,17 +2,18 @@
 FROM golang:1.20-alpine AS builder
 WORKDIR /app
 
-# 1. Instal dependensi sistem yang dibutuhkan Go
+# 1. Instal git dan ca-certificates (wajib untuk mengunduh modul)
 RUN apk add --no-cache git ca-certificates
 
-# 2. Atur GOPROXY agar pengambilan dependensi lebih stabil
+# 2. Atur GOPROXY dan izinkan go.mod diperbarui otomatis
 ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOFLAGS=-mod=mod
 
-# 3. Salin file modul dan unduh dependensi
+# 3. Salin go.mod dan jalankan tidy (akan mengunduh dependensi & memperbarui go.mod)
 COPY go.mod ./
 RUN go mod tidy
 
-# 4. Salin sisa kode dan lakukan build
+# 4. Salin kode utama dan build
 COPY main.go ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /ouo-service .
 
